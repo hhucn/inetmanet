@@ -132,7 +132,7 @@ class INET_API IP : public QueueBase
     /**
      * Forwards packets to all broadcast destinations, using fragmentAndSend().
      */
-    virtual void routeBroadcastPacket(IPDatagram *datagram, bool fromHL, InterfaceEntry *fromIE);
+    virtual void routeBroadcastPacket(IPDatagram *datagram, bool fromHL, InterfaceEntry *fromIE, int channelId = 0);
 
     /**
      * Perform reassembly of fragmented datagrams, then send them up to the

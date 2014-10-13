@@ -40,6 +40,7 @@ IPControlInfo_Base::IPControlInfo_Base() : cObject()
     this->timeToLive_var = 0;
     this->dontFragment_var = 0;
     this->moreFragments_var = 0;
+    this->channelId_var = 0;
 }
 
 IPControlInfo_Base::IPControlInfo_Base(const IPControlInfo_Base& other) : cObject(other)
@@ -72,6 +73,7 @@ void IPControlInfo_Base::copy(const IPControlInfo_Base& other)
     this->moreFragments_var = other.moreFragments_var;
     this->macSrc_var = other.macSrc_var;
     this->macDest_var = other.macDest_var;
+    this->channelId_var = other.channelId_var;
 }
 
 void IPControlInfo_Base::parsimPack(cCommBuffer *b)
@@ -87,6 +89,7 @@ void IPControlInfo_Base::parsimPack(cCommBuffer *b)
     doPacking(b,this->moreFragments_var);
     doPacking(b,this->macSrc_var);
     doPacking(b,this->macDest_var);
+    doPacking(b,this->channelId_var);
 }
 
 void IPControlInfo_Base::parsimUnpack(cCommBuffer *b)
@@ -102,6 +105,7 @@ void IPControlInfo_Base::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->moreFragments_var);
     doUnpacking(b,this->macSrc_var);
     doUnpacking(b,this->macDest_var);
+    doUnpacking(b,this->channelId_var);
 }
 
 IPAddress& IPControlInfo_Base::getDestAddr()
@@ -214,6 +218,16 @@ void IPControlInfo_Base::setMacDest(const MACAddress& macDest)
     this->macDest_var = macDest;
 }
 
+int IPControlInfo_Base::getChannelId() const
+{
+    return channelId_var;
+}
+
+void IPControlInfo_Base::setChannelId(int channelId)
+{
+    this->channelId_var = channelId;
+}
+
 class IPControlInfoDescriptor : public cClassDescriptor
 {
   public:
@@ -262,7 +276,7 @@ const char *IPControlInfoDescriptor::getProperty(const char *propertyname) const
 int IPControlInfoDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 11+basedesc->getFieldCount(object) : 11;
+    return basedesc ? 12+basedesc->getFieldCount(object) : 12;
 }
 
 unsigned int IPControlInfoDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -285,8 +299,9 @@ unsigned int IPControlInfoDescriptor::getFieldTypeFlags(void *object, int field)
         FD_ISEDITABLE,
         FD_ISCOMPOUND,
         FD_ISCOMPOUND,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<11) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<12) ? fieldTypeFlags[field] : 0;
 }
 
 const char *IPControlInfoDescriptor::getFieldName(void *object, int field) const
@@ -309,8 +324,9 @@ const char *IPControlInfoDescriptor::getFieldName(void *object, int field) const
         "moreFragments",
         "macSrc",
         "macDest",
+        "channelId",
     };
-    return (field>=0 && field<11) ? fieldNames[field] : NULL;
+    return (field>=0 && field<12) ? fieldNames[field] : NULL;
 }
 
 int IPControlInfoDescriptor::findField(void *object, const char *fieldName) const
@@ -328,6 +344,7 @@ int IPControlInfoDescriptor::findField(void *object, const char *fieldName) cons
     if (fieldName[0]=='m' && strcmp(fieldName, "moreFragments")==0) return base+8;
     if (fieldName[0]=='m' && strcmp(fieldName, "macSrc")==0) return base+9;
     if (fieldName[0]=='m' && strcmp(fieldName, "macDest")==0) return base+10;
+    if (fieldName[0]=='c' && strcmp(fieldName, "channelId")==0) return base+11;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -351,8 +368,9 @@ const char *IPControlInfoDescriptor::getFieldTypeString(void *object, int field)
         "bool",
         "MACAddress",
         "MACAddress",
+        "int",
     };
-    return (field>=0 && field<11) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<12) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *IPControlInfoDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -406,6 +424,7 @@ std::string IPControlInfoDescriptor::getFieldAsString(void *object, int field, i
         case 8: return bool2string(pp->getMoreFragments());
         case 9: {std::stringstream out; out << pp->getMacSrc(); return out.str();}
         case 10: {std::stringstream out; out << pp->getMacDest(); return out.str();}
+        case 11: return long2string(pp->getChannelId());
         default: return "";
     }
 }
@@ -426,6 +445,7 @@ bool IPControlInfoDescriptor::setFieldAsString(void *object, int field, int i, c
         case 5: pp->setTimeToLive(string2long(value)); return true;
         case 6: pp->setDontFragment(string2bool(value)); return true;
         case 8: pp->setMoreFragments(string2bool(value)); return true;
+        case 11: pp->setChannelId(string2long(value)); return true;
         default: return false;
     }
 }
@@ -450,8 +470,9 @@ const char *IPControlInfoDescriptor::getFieldStructName(void *object, int field)
         NULL,
         "MACAddress",
         "MACAddress",
+        NULL,
     };
-    return (field>=0 && field<11) ? fieldStructNames[field] : NULL;
+    return (field>=0 && field<12) ? fieldStructNames[field] : NULL;
 }
 
 void *IPControlInfoDescriptor::getFieldStructPointer(void *object, int field, int i) const

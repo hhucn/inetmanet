@@ -77,6 +77,7 @@ class IPControlInfo
     MACAddress macSrc;  // src MAC address (can be left empty when sending)
     MACAddress macDest; // dest MAC address
 
+    int channelId; // wlan channel
 }
 
 

@@ -207,7 +207,6 @@ void ChannelControl::updateConnections(HostRef h)
     for (HostList::iterator it = hosts.begin(); it != hosts.end(); ++it)
     {
         HostEntry *hi = &(*it);
-
         if (hi == h)
             continue;
 

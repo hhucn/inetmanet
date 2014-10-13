@@ -41,6 +41,7 @@
  *     MACAddress macSrc;  
  *     MACAddress macDest; 
  * 
+ *     int channelId; 
  * }
  * </pre>
  *
@@ -82,6 +83,7 @@ class IPControlInfo_Base : public ::cObject
     bool moreFragments_var;
     MACAddress macSrc_var;
     MACAddress macDest_var;
+    int channelId_var;
 
   private:
     void copy(const IPControlInfo_Base& other);
@@ -129,6 +131,8 @@ class IPControlInfo_Base : public ::cObject
     virtual MACAddress& getMacDest();
     virtual const MACAddress& getMacDest() const {return const_cast<IPControlInfo_Base*>(this)->getMacDest();}
     virtual void setMacDest(const MACAddress& macDest);
+    virtual int getChannelId() const;
+    virtual void setChannelId(int channelId);
 };
 
 /**

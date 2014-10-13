@@ -287,13 +287,15 @@ void IP::handleMessageFromHL(cPacket *msg)
     IPControlInfo *controlInfo = check_and_cast<IPControlInfo*>(msg->removeControlInfo());
     IPDatagram *datagram = encapsulate(msg, destIE,controlInfo);
     nextHopAddress = controlInfo->getNextHopAddr();
+    int channelId = controlInfo->getChannelId();
+
     delete controlInfo;
     if (!nextHopAddress.isUnspecified())
         nextHopAddressPrt=&nextHopAddress;
 
     // route packet
     if (datagram->getDestAddress() == IPAddress::ALLONES_ADDRESS) {
-    	routeBroadcastPacket(datagram, true, NULL);
+    	routeBroadcastPacket(datagram, true, NULL, channelId);
     } else if (!datagram->getDestAddress().isMulticast()) {
         routePacket(datagram, destIE, true,nextHopAddressPrt);
     } else {
@@ -580,7 +582,7 @@ void IP::routeMulticastPacket(IPDatagram *datagram, InterfaceEntry *destIE, Inte
     }
 }
 // (for broadcast support)
-void IP::routeBroadcastPacket(IPDatagram *datagram, bool fromHL, InterfaceEntry *fromIE)
+void IP::routeBroadcastPacket(IPDatagram *datagram, bool fromHL, InterfaceEntry *fromIE, int channelId)
 {
     IPAddress destAddr = datagram->getDestAddress();
     EV << "Routing broadcast datagram `" << datagram->getName() << "' with dest=" << destAddr << "\n";
@@ -611,9 +613,12 @@ void IP::routeBroadcastPacket(IPDatagram *datagram, bool fromHL, InterfaceEntry 
         {
             InterfaceEntry *destIE = routes[i].interf;
 
-            // don't forward to input port
-            if (destIE && destIE!=fromIE)
+            // don't forward to input port and only send on designated channel/radio
+            if (destIE && destIE != fromIE && destIE->getNetworkLayerGateIndex() == channelId)
             {
+
+                EV << "IP datagramm will be send on WLAN Interface #" << destIE->getNetworkLayerGateIndex() << endl;
+
                 IPDatagram *datagramCopy = (IPDatagram *) datagram->dup();
 
                 // set datagram source address if not yet set

@@ -75,5 +75,6 @@ class UDPControlInfo
     int srcPort;   // \UDP source port in packet, or local port with BIND
     int destPort;  // \UDP destination port in packet
     int interfaceId = -1; // interface on which pk was received/should be sent (see InterfaceTable)
+    int channelId = 0;  // wlan channel
 }
 

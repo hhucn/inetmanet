@@ -515,6 +515,7 @@ void UDP::processMsgFromApp(cPacket *appData)
         ipControlInfo->setSrcAddr(udpCtrl->getSrcAddr().get4());
         ipControlInfo->setDestAddr(udpCtrl->getDestAddr().get4());
         ipControlInfo->setInterfaceId(udpCtrl->getInterfaceId());
+        ipControlInfo->setChannelId(udpCtrl->getChannelId());
         udpPacket->setControlInfo(ipControlInfo);
         delete udpCtrl;
 

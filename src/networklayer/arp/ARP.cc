@@ -42,13 +42,8 @@ Define_Module (ARP);
 
 void ARP::initialize(int stage)
 {
-    if (stage==0) {
-    	static bool once = true;
-    	if (once) {
-    		globalArpCache.clear();
-    		once = false;
-    	}
-    }
+    if (stage==0)
+        globalArpCache.clear();
 
     if (stage==4)
     {

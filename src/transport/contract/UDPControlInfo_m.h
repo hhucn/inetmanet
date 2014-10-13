@@ -67,6 +67,7 @@ enum UDPStatusInd {
  *     int srcPort;   
  *     int destPort;  
  *     int interfaceId = -1; 
+ *     int channelId = 0;  
  * }
  * </pre>
  */
@@ -80,6 +81,7 @@ class UDPControlInfo : public ::cObject
     int srcPort_var;
     int destPort_var;
     int interfaceId_var;
+    int channelId_var;
 
   private:
     void copy(const UDPControlInfo& other);
@@ -114,6 +116,8 @@ class UDPControlInfo : public ::cObject
     virtual void setDestPort(int destPort);
     virtual int getInterfaceId() const;
     virtual void setInterfaceId(int interfaceId);
+    virtual int getChannelId() const;
+    virtual void setChannelId(int channelId);
 };
 
 inline void doPacking(cCommBuffer *b, UDPControlInfo& obj) {obj.parsimPack(b);}

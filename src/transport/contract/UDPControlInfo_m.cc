@@ -57,6 +57,7 @@ UDPControlInfo::UDPControlInfo() : cObject()
     this->srcPort_var = 0;
     this->destPort_var = 0;
     this->interfaceId_var = -1;
+    this->channelId_var = 0;
 }
 
 UDPControlInfo::UDPControlInfo(const UDPControlInfo& other) : cObject(other)
@@ -85,6 +86,7 @@ void UDPControlInfo::copy(const UDPControlInfo& other)
     this->srcPort_var = other.srcPort_var;
     this->destPort_var = other.destPort_var;
     this->interfaceId_var = other.interfaceId_var;
+    this->channelId_var = other.channelId_var;
 }
 
 void UDPControlInfo::parsimPack(cCommBuffer *b)
@@ -96,6 +98,7 @@ void UDPControlInfo::parsimPack(cCommBuffer *b)
     doPacking(b,this->srcPort_var);
     doPacking(b,this->destPort_var);
     doPacking(b,this->interfaceId_var);
+    doPacking(b,this->channelId_var);
 }
 
 void UDPControlInfo::parsimUnpack(cCommBuffer *b)
@@ -107,6 +110,7 @@ void UDPControlInfo::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->srcPort_var);
     doUnpacking(b,this->destPort_var);
     doUnpacking(b,this->interfaceId_var);
+    doUnpacking(b,this->channelId_var);
 }
 
 int UDPControlInfo::getSockId() const
@@ -179,6 +183,16 @@ void UDPControlInfo::setInterfaceId(int interfaceId)
     this->interfaceId_var = interfaceId;
 }
 
+int UDPControlInfo::getChannelId() const
+{
+    return channelId_var;
+}
+
+void UDPControlInfo::setChannelId(int channelId)
+{
+    this->channelId_var = channelId;
+}
+
 class UDPControlInfoDescriptor : public cClassDescriptor
 {
   public:
@@ -226,7 +240,7 @@ const char *UDPControlInfoDescriptor::getProperty(const char *propertyname) cons
 int UDPControlInfoDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 7+basedesc->getFieldCount(object) : 7;
+    return basedesc ? 8+basedesc->getFieldCount(object) : 8;
 }
 
 unsigned int UDPControlInfoDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -245,8 +259,9 @@ unsigned int UDPControlInfoDescriptor::getFieldTypeFlags(void *object, int field
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<7) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<8) ? fieldTypeFlags[field] : 0;
 }
 
 const char *UDPControlInfoDescriptor::getFieldName(void *object, int field) const
@@ -265,8 +280,9 @@ const char *UDPControlInfoDescriptor::getFieldName(void *object, int field) cons
         "srcPort",
         "destPort",
         "interfaceId",
+        "channelId",
     };
-    return (field>=0 && field<7) ? fieldNames[field] : NULL;
+    return (field>=0 && field<8) ? fieldNames[field] : NULL;
 }
 
 int UDPControlInfoDescriptor::findField(void *object, const char *fieldName) const
@@ -280,6 +296,7 @@ int UDPControlInfoDescriptor::findField(void *object, const char *fieldName) con
     if (fieldName[0]=='s' && strcmp(fieldName, "srcPort")==0) return base+4;
     if (fieldName[0]=='d' && strcmp(fieldName, "destPort")==0) return base+5;
     if (fieldName[0]=='i' && strcmp(fieldName, "interfaceId")==0) return base+6;
+    if (fieldName[0]=='c' && strcmp(fieldName, "channelId")==0) return base+7;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -299,8 +316,9 @@ const char *UDPControlInfoDescriptor::getFieldTypeString(void *object, int field
         "int",
         "int",
         "int",
+        "int",
     };
-    return (field>=0 && field<7) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<8) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *UDPControlInfoDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -347,6 +365,7 @@ std::string UDPControlInfoDescriptor::getFieldAsString(void *object, int field, 
         case 4: return long2string(pp->getSrcPort());
         case 5: return long2string(pp->getDestPort());
         case 6: return long2string(pp->getInterfaceId());
+        case 7: return long2string(pp->getChannelId());
         default: return "";
     }
 }
@@ -366,6 +385,7 @@ bool UDPControlInfoDescriptor::setFieldAsString(void *object, int field, int i, 
         case 4: pp->setSrcPort(string2long(value)); return true;
         case 5: pp->setDestPort(string2long(value)); return true;
         case 6: pp->setInterfaceId(string2long(value)); return true;
+        case 7: pp->setChannelId(string2long(value)); return true;
         default: return false;
     }
 }
@@ -386,8 +406,9 @@ const char *UDPControlInfoDescriptor::getFieldStructName(void *object, int field
         NULL,
         NULL,
         NULL,
+        NULL,
     };
-    return (field>=0 && field<7) ? fieldStructNames[field] : NULL;
+    return (field>=0 && field<8) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPControlInfoDescriptor::getFieldStructPointer(void *object, int field, int i) const
