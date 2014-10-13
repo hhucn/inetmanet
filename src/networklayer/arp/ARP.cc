@@ -123,9 +123,10 @@ ARP::~ARP()
         while (!localAddress.empty())
         {
             ARPCache::iterator it = globalArpCache.find(localAddress.back());
-            if (it==globalArpCache.end())
-                throw cRuntimeError(this, "Addres not found in global");
-            else
+            if (it==globalArpCache.end()) {
+//                throw cRuntimeError(this, "Addres not found in global");
+//                Shit happens
+            } else
             {
                 delete (*it).second;
                 globalArpCache.erase(it);
