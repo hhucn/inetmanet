@@ -27,6 +27,7 @@
 #include "SnrList.h"
 #include "ObstacleControl.h"
 #include "IPowerControl.h"
+#include "IShadowingModel.h"
 
 
 /**
@@ -176,6 +177,7 @@ class INET_API AbstractRadioExtended : public ChannelAccessExtended, public IPow
     ObstacleControl* obstacles;
     IRadioModel *radioModel;
     IReceptionModel *receptionModel;
+    IShadowingModel *shadowingModel;
 
     /** @name Statistics */
     //@{

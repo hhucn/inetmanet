@@ -32,6 +32,8 @@ simple PropagationModel like Radio
       double  TransmiterAntennaHigh @unit("m") = default(1m);   // Transmitter Antenna High 
       double  ReceiverAntennaHigh   @unit("m") = default(1m);	// Receiver Antenna High
       double DielectricConstant = default(1);					// Epsilon_r
+      double signalLossFactorWall = default(1);					// Loss at walls in case of PenetrationPropagation
+      double signalLossFactorBuilding = default(1);				// Loss per meter of building for PenetrationPropagation
    gates:
         input uppergateIn @labels(PhyControlInfo/down); // from higher layer protocol (MAC)
         output uppergateOut @labels(PhyControlInfo/up); // to higher layer protocol (MAC)

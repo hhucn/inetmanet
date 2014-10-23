@@ -39,6 +39,7 @@ AbstractRadioExtended::AbstractRadioExtended() : rs(this->getId())
     obstacles=NULL;
     radioModel = NULL;
     receptionModel = NULL;
+    shadowingModel = NULL;
     transceiverConnect = true;
     updateString = NULL;
 }
@@ -101,18 +102,27 @@ void AbstractRadioExtended::initialize(int stage)
 
         std::string propModel =  cc->par("propagationModel").stdstringValue();
 
-        if (propModel!="")
-            receptionModel = (IReceptionModel *) createOne(propModel.c_str());
-        else
-        {
-            if (par("attenuationModel").stdstringValue ()=="tworay")
-                receptionModel = createReceptionModelTwoRay();
-            else if (par("attenuationModel").stdstringValue ()=="pathlost")
-                receptionModel = createReceptionModelPathLost();
-            else
-                receptionModel = createReceptionModel();
+        if ((propModel == "ShadowPropagationLossModel") ||
+            (propModel == "PenetrationPropagationLossModel") ||
+            (propModel == "DiffractionPropagationLossModel")) {
+
+            shadowingModel = (IShadowingModel *) createOne(propModel.c_str());
+            shadowingModel->initializeFrom(this);
         }
-        receptionModel->initializeFrom(this);
+        else {
+            if (propModel!="")
+                receptionModel = (IReceptionModel *) createOne(propModel.c_str());
+            else
+            {
+                if (par("attenuationModel").stdstringValue ()=="tworay")
+                    receptionModel = createReceptionModelTwoRay();
+                else if (par("attenuationModel").stdstringValue ()=="pathlost")
+                    receptionModel = createReceptionModelPathLost();
+                else
+                    receptionModel = createReceptionModel();
+            }
+            receptionModel->initializeFrom(this);
+        }
 
         radioModel = createRadioModel();
         radioModel->initializeFrom(this);
@@ -571,8 +581,14 @@ void AbstractRadioExtended::handleLowerMsgStart(AirFrame* airframe)
     if (distance<MIN_DISTANCE)
         distance = MIN_DISTANCE;
 
-    double rcvdPower = receptionModel->calculateReceivedPower(airframe->getPSend(), frequency, distance);
-    if (obstacles && distance > MIN_DISTANCE) rcvdPower = obstacles->calculateReceivedPower(rcvdPower, carrierFrequency, framePos, 0, myPos, 0);
+    double rcvdPower = 0;
+    if (shadowingModel) {
+        rcvdPower = shadowingModel->calculateReceivedPower(airframe->getPSend(), frequency, framePos, myPos);
+    }
+    else {
+        rcvdPower = receptionModel->calculateReceivedPower(airframe->getPSend(), frequency, distance);
+        if (obstacles && distance > MIN_DISTANCE) rcvdPower = obstacles->calculateReceivedPower(rcvdPower, carrierFrequency, framePos, 0, myPos, 0);
+    }
     airframe->setPowRec(rcvdPower);
     // store the receive power in the recvBuff
     recvBuff[airframe] = rcvdPower;
