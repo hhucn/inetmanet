@@ -42,8 +42,8 @@ Define_Module (ARP);
 
 void ARP::initialize(int stage)
 {
-    if (stage==0)
-        globalArpCache.clear();
+//    if (stage==0)
+//        globalArpCache.clear();
 
     if (stage==4)
     {
@@ -88,7 +88,6 @@ void ARP::initialize(int stage)
             ARPCache::iterator where = globalArpCache.insert(globalArpCache.begin(), std::make_pair(nextHopAddr,entry));
             entry->myIter = where; // note: "inserting a new element into a map does not invalidate iterators that point to existing elements"
             localAddress.push_back(nextHopAddr);
-
         }
         nb = NotificationBoardAccess().get();
         if (nb!=NULL && globalARP)
@@ -124,8 +123,7 @@ ARP::~ARP()
         {
             ARPCache::iterator it = globalArpCache.find(localAddress.back());
             if (it==globalArpCache.end()) {
-//                throw cRuntimeError(this, "Addres not found in global");
-//                Shit happens
+                throw cRuntimeError(this, "Addres not found in global");
             } else
             {
                 delete (*it).second;
@@ -237,11 +235,16 @@ void ARP::processOutboundPacket(cMessage *msg)
     if (globalARP)
     {
         ARPCache::iterator it = globalArpCache.find(nextHopAddr);
-        if (it==globalArpCache.end())
-            opp_error("Addres not found in global %s",nextHopAddr.str().c_str());
-        else
+        if (it==globalArpCache.end()) {
+//            opp_error("Addres not found in global %s",nextHopAddr.str().c_str());
+        	//Instead of throwing an error, we simply discard the message and log it
+        	EV << "Cannot find destination host " << nextHopAddr << " in global ARP, discarding message " << msg << endl;
+        	delete msg;
+        	return;
+        } else {
             sendPacketToNIC(msg, ie, (*it).second->macAddress);
-        return;
+            return;
+        }
     }
 
     // try look up
