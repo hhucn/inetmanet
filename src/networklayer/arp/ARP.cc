@@ -123,7 +123,8 @@ ARP::~ARP()
         {
             ARPCache::iterator it = globalArpCache.find(localAddress.back());
             if (it==globalArpCache.end()) {
-                throw cRuntimeError(this, "Addres not found in global");
+//                throw cRuntimeError(this, "Addres not found in global");
+            	std::cerr << "Error removing address " << localAddress.back().str() << ": Address not found in global ARP cache" << std::endl;
             } else
             {
                 delete (*it).second;
