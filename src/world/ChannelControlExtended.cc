@@ -284,6 +284,10 @@ ChannelControl::HostRef ChannelControlExtended::registerHost(cModule * host, con
         error("ChannelControlExtended::registerHost(): host (%s)%s already registered",
               host->getClassName(), host->getFullPath().c_str());
 
+    if (!radioInGate) {
+    	radioInGate = host->gate("radioIn"); // Throws exception if not exists
+    }
+
     HostEntryExtended he;
     he.host = host;
     he.pos = initialPos;
